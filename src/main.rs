@@ -1,5 +1,7 @@
 mod color;
 mod image_map;
+use std::cell::Cell;
+
 use color::{Color, Pallete};
 use image::{ImageBuffer, Rgb};
 use image_map::ImageMap;
@@ -24,8 +26,6 @@ fn create_image(image_map: ImageMap) -> ImageMap {
     let color_palette: Vec<Color> = Pallete::get_pallette();
     let mut last_color: Option<Color> = None;
 
-    let mut new_map: Vec<((usize, usize), Color)> = Vec::new();
-
     for ((x, y), _pixel) in image_map.iter() {
         let rand_color = color_palette
             .choose(&mut rand::thread_rng())
@@ -37,12 +37,8 @@ fn create_image(image_map: ImageMap) -> ImageMap {
         if let Some(last_color) = last_color {
             color_options.push(last_color.clone());
         }
-        if let Some(above_color) = new_map
-            .iter()
-            .find(|((x, y), _color)| y == &(above_y as usize) && x == x)
-            .map(|((_x, _y), color)| color)
-        {
-            color_options.push(above_color.clone());
+        if let Some(above_color) = image_map.get(x, &(above_y as usize)) {
+            color_options.push(above_color);
         }
 
         let color = color_options
@@ -51,8 +47,7 @@ fn create_image(image_map: ImageMap) -> ImageMap {
             .clone();
 
         last_color = Some(color.clone());
-        new_map.push(((x.clone(), y.clone()), color));
+        _pixel.set(color.clone());
     }
-    let image_map = ImageMap::from_vec(new_map);
     return image_map;
 }
