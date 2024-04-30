@@ -23,17 +23,16 @@ fn main() {
 fn create_image(image_map: ImageMap) -> ImageMap {
     let color_palette: Vec<Color> = Pallete::get_pallette();
     let mut last_color: Option<Color> = None;
-    let above_color: Option<Color> = None;
 
     let mut new_map: Vec<((usize, usize), Color)> = Vec::new();
 
-    image_map.iter().for_each(|((x, y), _pixel)| {
+    for ((x, y), _pixel) in image_map.iter() {
         let rand_color = color_palette
             .choose(&mut rand::thread_rng())
             .unwrap()
             .clone();
         let above_y = y.clone() as i32 - 1;
-        // let index = y * image_map.width as i32 + x.clone() as i32;
+
         let mut color_options = vec![rand_color];
         if let Some(last_color) = last_color {
             color_options.push(last_color.clone());
@@ -50,17 +49,10 @@ fn create_image(image_map: ImageMap) -> ImageMap {
             .choose(&mut rand::thread_rng())
             .unwrap()
             .clone();
-        if color == [0, 0, 0] {
-            debug!("Black! at x: {}, y: {}", x, y);
-            debug!("Above color: {:?}", above_color);
-            debug!("Prev color: {:?}", last_color);
-            debug!("Rand color: {:?}", rand_color);
-            debug!("Color options: {:?}", color_options);
-            panic!();
-        }
+
         last_color = Some(color.clone());
         new_map.push(((x.clone(), y.clone()), color));
-    });
+    }
     let image_map = ImageMap::from_vec(new_map);
     return image_map;
 }
