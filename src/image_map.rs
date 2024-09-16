@@ -3,10 +3,9 @@ use indexmap::{
     IndexMap,
 };
 use itertools::iproduct;
-use log::{trace, warn};
+use log::warn;
 use std::{
     cell::Cell,
-    collections::HashMap,
     fmt::{self, Formatter},
 };
 
@@ -22,13 +21,13 @@ pub struct ImageMap {
 impl ImageMap {
     pub fn new(x: usize, y: usize) -> Self {
         let prod = iproduct!(0..x, 0..y);
-        let map_iter = prod.into_iter().map(|x| (x, Cell::new([0 as u8, 0, 0])));
+        let map_iter = prod.into_iter().map(|x| (x, Cell::new([0, 0, 0])));
         let hash_map: IndexMap<(usize, usize), Cell<Color>> = IndexMap::from_iter(map_iter);
-        return ImageMap {
+        ImageMap {
             underlying_map: hash_map,
             width: x,
             height: y,
-        };
+        }
     }
 }
 
@@ -46,7 +45,7 @@ impl ImageMap {
         self.underlying_map.get(&(*x, *y)).map(|x| x.get())
     }
     #[allow(dead_code)]
-    pub fn from_iter<'a, I>(iter: I) -> Self
+    pub fn from_iter<I>(iter: I) -> Self
     where
         I: Iterator<Item = ((usize, usize), Cell<Color>)>,
     {
@@ -54,11 +53,11 @@ impl ImageMap {
         let (width, height) = hash_map
             .keys()
             .fold((0, 0), |acc, (x, y)| (acc.0.max(*x), acc.1.max(*y)));
-        return ImageMap {
+        ImageMap {
             underlying_map: hash_map,
             width: width + 1,
             height: height + 1,
-        };
+        }
     }
 
     // pub fn from_vec(vec: Vec<((usize, usize), Cell<Color>)>) -> Self {
